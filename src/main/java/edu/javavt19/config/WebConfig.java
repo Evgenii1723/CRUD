@@ -7,6 +7,7 @@ import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.ResourceBundleViewResolver;
 
@@ -39,5 +40,63 @@ public class WebConfig extends WebMvcConfigurerAdapter {
             registry.addResourceHandler("/webjars/**")
                     .addResourceLocations("classpath:/META-INF/resources/webjars/");
         }
+    }
+
+    @Configuration
+    @ComponentScan({"edu.javavt19"})
+    @EnableWebMvc
+    public static class WebConfig extends WebMvcConfigurerAdapter {
+
+        @Bean
+        public ViewResolver getViewResolver() {
+            InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+            resolver.setPrefix("/pages/");
+            resolver.setSuffix(".jsp");
+            resolver.setOrder(2);
+            return resolver;
+        }
+
+        @Bean
+        public ViewResolver resourceBundleViewResolver() {
+            ResourceBundleViewResolver resolver = new ResourceBundleViewResolver();
+            resolver.setBasename("view");
+            resolver.setOrder(1);
+            return resolver;
+        }
+
+        @Override
+        public void addResourceHandlers(ResourceHandlerRegistry registry) {
+            registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
+            if (!registry.hasMappingForPattern("/webjars/**")) {
+                registry.addResourceHandler("/webjars/**")
+                        .addResourceLocations("classpath:/META-INF/resources/webjars/");
+            }
+        }
+    }
+
+    public static class AppInit extends AbstractAnnotationConfigDispatcherServletInitializer {
+        // Этот метод должен содержать конфигурации которые инициализируют Beans
+        // для инициализации бинов у нас использовалась аннотация @Bean
+        @Override
+        protected Class<?>[] getRootConfigClasses() {
+            return new Class<?>[]{
+                    WebConfig.class
+            };
+        }
+
+        // Тут добавляем конфигурацию, в которой инициализируем ViewResolver
+        @Override
+        protected Class<?>[] getServletConfigClasses() {
+
+            return new Class<?>[]{
+                    WebConfig.class
+            };
+        }
+
+        @Override
+        protected String[] getServletMappings() {
+            return new String[]{"/"};
+        }
+
     }
 }
