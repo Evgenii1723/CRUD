@@ -1,5 +1,6 @@
 package edu.javavt19.dao.hibernate;
 
+import edu.javavt19.dao.CarModelDAO;
 import edu.javavt19.model.CarModel;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
